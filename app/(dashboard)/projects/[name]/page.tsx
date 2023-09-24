@@ -1,4 +1,4 @@
-export default function ProjectList({params}) {
+export default function ProjectList({params}:any) {
     return (
       <main>
          <h1>Project Details : {params.name} </h1>
