@@ -12,7 +12,7 @@ export default function Products() {
           <li>Mobile</li>
         </Link>
         <Link href="/products/television">
-          <li>TV</li>
+          <li>Television</li>
         </Link>
       </ul>
     </main>
