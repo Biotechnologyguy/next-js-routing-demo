@@ -32,6 +32,9 @@ const Navbar = () => {
           <Link href='/docs'>
             <li>Docs 📚</li>
           </Link>
+          <Link href='/some-rubbish'>
+            <li>404</li>
+          </Link>
         </ul>
       </nav>
     </header>
