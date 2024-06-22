@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function Cart() {
   return (
     <main>
@@ -9,8 +10,9 @@ export default function Cart() {
         <li>Laptop</li>
         <li>Mobile</li>
         <li>Kohinoor</li>
-        <Link href="/checkout">Checkout</Link>
-      </ul>
+        <br />
+        <Link href={'/checkout'}>Checkout</Link>
+      </ul> 
     </main>
   );
 }

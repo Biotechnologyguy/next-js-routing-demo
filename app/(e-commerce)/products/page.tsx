@@ -15,6 +15,19 @@ export default function Products() {
           <li>Television</li>
         </Link>
       </ul>
+
+      <h1>Reviews</h1>
+      <ul>
+        <Link href="/products/1/reviews/1">
+          <li>Review 1</li>
+        </Link>
+        <Link href="/products/1/reviews/2">
+          <li>Review 2</li>
+        </Link>
+        <Link href="/products/1/reviews/3">
+          <li>Review 3</li>
+        </Link>
+      </ul>
     </main>
   );
 }
