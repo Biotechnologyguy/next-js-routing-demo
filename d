@@ -1,30 +1,17 @@
-'use client';
+"use client"
 
-import { useEffect, useState, SyntheticEvent } from 'react';
+import { useState, MouseEvent, useEffect, forwardRef } from 'react';
 import { useTheme } from '@mui/material/styles';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import Tabs from '@mui/material/Tabs';
-import Grid from '@mui/material/Grid';
-import List from '@mui/material/List';
+import Chip from '@mui/material/Chip';
+import Menu from '@mui/material/Menu';
 import Stack from '@mui/material/Stack';
-import ListItem from '@mui/material/ListItem';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ListItemButton from '@mui/material/ListItemButton';
+import { Box } from '@mui/material';
+import { IconButton } from '@mui/material';
 import ReactApexChart, { Props as ChartProps } from 'react-apexcharts';
-import { Avatar, IconButton } from '@mui/material';
-import { ArrowDown, ArrowSwapHorizontal, ArrowUp, Bookmark, Chart, Edit, HomeTrendUp, Maximize4, ShoppingCart } from 'iconsax-react';
 
-enum ThemeMode {
-  LIGHT = 'light',
-  DARK = 'dark',
-  AUTO = 'auto'
-}
-
+// MoreIcon component
 const MoreIcon = () => {
   return (
     <svg
@@ -46,57 +33,46 @@ const MoreIcon = () => {
   );
 };
 
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`
-  };
-}
-
-const CaregiverDataChart = ({ data }: { data: any[] }) => {
-  const theme = useTheme();
-  const mode = theme.palette.mode;
-
-  const areaChartOptions = {
-    chart: {
-      type: 'bar',
-      toolbar: {
-        show: false
-      }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '55%',
-        borderRadius: 4
-      }
-    },
-    legend: {
-      show: true,
-      position: 'top',
-      horizontalAlign: 'left'
-    },
-    dataLabels: {
-      enabled: false
-    },
-    stroke: {
-      show: true,
-      width: 2,
-      colors: ['transparent']
-    },
-    fill: {
-      opacity: 1
-    },
-    grid: {
-      strokeDashArray: 4
-    },
-    tooltip: {
-      y: {
-        formatter: (val: number) => val.toString()
-      }
+// Chart options
+const areaChartOptions = {
+  chart: {
+    type: 'area',
+    toolbar: {
+      show: false
     }
-  };
+  },
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    width: 1
+  },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      type: 'vertical',
+      inverseColors: false,
+      opacityFrom: 0.5,
+      opacityTo: 0
+    }
+  },
+  plotOptions: {
+    bar: {
+      columnWidth: '45%',
+      borderRadius: 4
+    }
+  },
+  grid: {
+    strokeDashArray: 4
+  }
+};
 
+// SymptomsChart component
+const SymptomsChart = () => {
+  const theme = useTheme();
+
+  const mode = theme.palette.mode;
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
 
@@ -105,12 +81,12 @@ const CaregiverDataChart = ({ data }: { data: any[] }) => {
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
-      colors: [theme.palette.primary.main, theme.palette.secondary.main, theme.palette.success.main],
+      colors: [theme.palette.primary.main, theme.palette.primary.dark],
       xaxis: {
-        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         labels: {
           style: {
-            colors: Array(7).fill(secondary)
+            colors: Array(12).fill(secondary)
           }
         },
         axisBorder: {
@@ -120,7 +96,7 @@ const CaregiverDataChart = ({ data }: { data: any[] }) => {
         axisTicks: {
           show: false
         },
-        tickAmount: 6
+        tickAmount: 11
       },
       yaxis: {
         labels: {
@@ -132,176 +108,80 @@ const CaregiverDataChart = ({ data }: { data: any[] }) => {
       grid: {
         borderColor: line
       },
-      legend: {
-        labels: {
-          colors: secondary
-        }
-      },
       theme: {
-        mode: mode === ThemeMode.DARK ? 'dark' : 'light'
+        mode: mode === 'dark' ? 'dark' : 'light'
       }
     }));
   }, [mode, primary, secondary, line, theme]);
 
-  const [series, setSeries] = useState(data);
+  const [series] = useState([
+    {
+      name: 'Symptom Severity',
+      data: [30, 60, 40, 70, 50, 90, 50, 55, 45, 60, 50, 65]
+    }
+  ]);
 
-  useEffect(() => {
-    setSeries(data);
-  }, [data]);
-
-  return <ReactApexChart options={options} series={series} type="bar" height={250} />;
+  return <ReactApexChart options={options} series={series} type="area" height={260} />;
 };
 
-export default function CaregiverAnalytics() {
-  const [value, setValue] = useState(0);
-  const [timeframe, setTimeframe] = useState('30');
+// SymptomsTracker component
+const SymptomsTracker = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const chartData = [
-    [
-      {
-        name: 'Symptom Severity',
-        data: [5, 6, 5, 7, 6, 8, 6]
-      },
-      {
-        name: 'Medication Adherence',
-        data: [90, 92, 85, 88, 91, 89, 94]
-      },
-      {
-        name: 'Activity Levels',
-        data: [60, 65, 62, 70, 68, 75, 72]
-      }
-    ],
-    [
-      {
-        name: 'Symptom Severity',
-        data: [4, 5, 6, 6, 5, 7, 5]
-      },
-      {
-        name: 'Medication Adherence',
-        data: [88, 89, 87, 86, 90, 92, 93]
-      },
-      {
-        name: 'Activity Levels',
-        data: [65, 70, 67, 68, 70, 75, 73]
-      }
-    ]
-  ];
-
-  const [data, setData] = useState(chartData[0]);
-
-  const handleChangeSelect = (event: SelectChangeEvent) => {
-    setTimeframe(event.target.value as string);
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const handleChange = (event: SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-    setData(chartData[newValue]);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
     <Box sx={{ p: 2, m: 2, border: '1px solid #e0e0e0', borderRadius: '8px' }}>
-      <Box sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" sx={{ px: 3, pt: 1, '& .MuiTab-root': { mb: 0.5 } }}>
-            <Tab label="Weekly" {...a11yProps(0)} />
-            <Tab label="Monthly" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <Box sx={{ p: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
-              <Stack spacing={2}>
-                <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={1}>
-                  <Box sx={{ minWidth: 120 }}>
-                    <FormControl fullWidth>
-                      <Select id="demo-simple-select" value={timeframe} onChange={handleChangeSelect}>
-                        <MenuItem value={10}>Today</MenuItem>
-                        <MenuItem value={20}>Weekly</MenuItem>
-                        <MenuItem value={30}>Monthly</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <IconButton color="secondary" sx={{ color: 'text.secondary' }}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton color="secondary" sx={{ color: 'text.secondary' }}>
-                    <Maximize4 />
-                  </IconButton>
-                  <IconButton color="secondary" sx={{ transform: 'rotate(90deg)', color: 'text.secondary' }}>
-                    <MoreIcon />
-                  </IconButton>
-                </Stack>
-                <CaregiverDataChart data={data} />
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <List disablePadding sx={{ '& .MuiListItem-root': { px: 3, py: 1.5 } }}>
-                <ListItem
-                  divider
-                  secondaryAction={
-                    <Stack spacing={0.25} alignItems="flex-end">
-                      <Typography variant="subtitle1">5</Typography>
-                      <Typography color="error" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <ArrowDown style={{ transform: 'rotate(45deg)' }} size={14} /> 10.6%
-                      </Typography>
-                    </Stack>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar variant="rounded" color="secondary" sx={{ color: 'text.secondary' }} />
-                      <Chart />
-                    </ListItemAvatar>
-                  <ListItemText
-                    primary={<Typography color="text.secondary">Symptom Severity</Typography>}
-                    secondary={<Typography variant="subtitle1">5</Typography>}
-                  />
-                </ListItem>
-                <ListItem
-                  divider
-                  secondaryAction={
-                    <Stack spacing={0.25} alignItems="flex-end">
-                      <Typography variant="subtitle1">+7</Typography>
-                      <Typography color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <ArrowUp style={{ transform: 'rotate(45deg)' }} size={14} /> 30.6%
-                      </Typography>
-                    </Stack>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar variant="rounded" color="secondary" sx={{ color: 'text.secondary' }}>
-                      <HomeTrendUp />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={<Typography color="text.secondary">Medication Adherence</Typography>}
-                    secondary={<Typography variant="subtitle1">90%</Typography>}
-                  />
-                </ListItem>
-                <ListItem
-                  secondaryAction={
-                    <Stack spacing={0.25} alignItems="flex-end">
-                      <Typography variant="subtitle1">+72</Typography>
-                      <Typography color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <ArrowUp style={{ transform: 'rotate(45deg)' }} size={14} /> 5%
-                      </Typography>
-                    </Stack>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar variant="rounded" color="secondary" sx={{ color: 'text.secondary' }}>
-                      <ShoppingCart />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={<Typography color="text.secondary">Activity Levels</Typography>}
-                    secondary={<Typography variant="subtitle1">72</Typography>}
-                  />
-                </ListItem>
-              </List>
-            </Grid>
-          </Grid>
-        </Box>
-      </Box>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+        <Typography variant="h5">Symptoms Tracker</Typography>
+        <IconButton
+          color="secondary"
+          id="symptoms-button"
+          aria-controls={open ? 'symptoms-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          sx={{ transform: 'rotate(90deg)' }}
+        >
+          <MoreIcon />
+        </IconButton>
+        <Menu
+          id="symptoms-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'symptoms-button',
+            sx: { p: 1.25, minWidth: 150 }
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+        >
+          <ListItemButton onClick={handleClose}>Today</ListItemButton>
+          <ListItemButton onClick={handleClose}>Weekly</ListItemButton>
+          <ListItemButton onClick={handleClose}>Monthly</ListItemButton>
+        </Menu>
+      </Stack>
+      <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0.5} sx={{ mt: 1 }}>
+        <Typography variant="subtitle1">Severity</Typography>
+        <Chip color="success" variant="filled" label="Mild" size="small" sx={{ bgcolor: 'success.main', borderRadius: 1 }} />
+      </Stack>
+      <SymptomsChart />
     </Box>
   );
-}
+};
+
+export default SymptomsTracker;
